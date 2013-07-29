@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/JCommander/jcommander-1.24-SNAPSHOT.jar" sourcepath="lib-doc/JCommander/jcommander-1.24-SNAPSHOT-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jcommander.org/apidocs/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
