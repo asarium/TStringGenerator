@@ -12,8 +12,6 @@ public class TString implements Comparable<TString>
 
     private static final Logger logger = Logger.getLogger(TString.class.getName());
 
-    private boolean editable = true;
-
     private int index = -1;
 
     private String value = null;
@@ -29,20 +27,6 @@ public class TString implements Comparable<TString>
     {
         this.setValue(value);
         this.setIndex(index);
-    }
-
-    /**
-     * Constructs a TString object with the aditional option to specify if it is
-     * editable.
-     *
-     * @param value    String valie
-     * @param index    The index
-     * @param editable Sets this object to be editable or not.
-     */
-    public TString(String value, int index, boolean editable)
-    {
-        this(value, index);
-        this.setEditable(editable);
     }
 
     @Override
@@ -87,11 +71,8 @@ public class TString implements Comparable<TString>
             return false;
         }
         TString other = (TString) obj;
-        if (this.index != other.index)
-        {
-            return false;
-        }
-        return true;
+
+        return this.index == other.index;
     }
 
     /**
@@ -121,16 +102,6 @@ public class TString implements Comparable<TString>
         int result = 1;
         result = prime * result + this.index;
         return result;
-    }
-
-    public boolean isEditable()
-    {
-        return this.editable;
-    }
-
-    public void setEditable(boolean editable)
-    {
-        this.editable = editable;
     }
 
     /**
