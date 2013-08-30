@@ -1,49 +1,32 @@
 package mm.tstring.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import mm.tstring.config.TStringConfig;
+import mm.tstring.config.TStringConfig.Mode;
+import mm.tstring.objects.TString;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mm.tstring.config.TStringConfig;
-import mm.tstring.config.TStringConfig.Mode;
-import mm.tstring.objects.TString;
-
 /**
  * Class declaring utility functions.
- * 
+ *
  * @author m!m
  */
 public class Util
 {
-    private static final Logger        logger          =
-                                                               Logger.getLogger(Util.class
-                                                                       .getName());
+    private static final Logger logger = Logger.getLogger(Util.class.getName());
 
-    private static final List<Integer> occupiedIndexes =
-                                                               new ArrayList<Integer>();
+    private static final List<Integer> occupiedIndexes = new ArrayList<Integer>();
 
     /**
      * Overloaded method. Referes to {@link #addTString(TString)}.
-     * 
-     * @param value
-     *            Value of the TString
-     * @param index
-     *            Index of the TString
+     *
+     * @param value Value of the TString
+     * @param index Index of the TString
      */
     public synchronized static void addTString(String value, int index)
     {
@@ -54,9 +37,8 @@ public class Util
      * Adds the specified <code>TString</code> to
      * {@link TStringGlobals#tstrings} but only if the value of the string isn't
      * already in the list.
-     * 
-     * @param string
-     *            The TString to add
+     *
+     * @param string The TString to add
      */
     public synchronized static void addTString(TString string)
     {
@@ -68,8 +50,7 @@ public class Util
             }
         }
 
-        if (!Util.occupiedIndexes.contains(string.getIndex())
-                && string.getIndex() > 0)
+        if (!Util.occupiedIndexes.contains(string.getIndex()) && string.getIndex() > 0)
         {
             TStringGlobals.tstrings.add(string);
             Util.occupiedIndexes.add(string.getIndex());
@@ -89,11 +70,9 @@ public class Util
 
     private static void askSwitch()
     {
-        System.out
-                .print("An existing TStrings table has been found. Do you want to switch to the update mode?(y/n)");
+        System.out.print("An existing TStrings table has been found. Do you want to switch to the update mode?(y/n)");
         String input = null;
-        BufferedReader stdIn =
-                new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         while (input == null)
         {
             try
@@ -121,11 +100,9 @@ public class Util
 
     /**
      * Copies <code>srFile</code> to <code>dtFile</code>
-     * 
-     * @param srFile
-     *            The source file to be copied.
-     * @param dtFile
-     *            The destination
+     *
+     * @param srFile The source file to be copied.
+     * @param dtFile The destination
      */
     public static void copyfile(String srFile, String dtFile)
     {
@@ -140,15 +117,13 @@ public class Util
                 File parent = f2.getParentFile();
                 if (!parent.exists() && !parent.mkdirs())
                 {
-                    Util.logger.severe("Coudln't create directory '"
-                            + parent.getAbsolutePath() + "'!");
+                    Util.logger.severe("Coudln't create directory '" + parent.getAbsolutePath() + "'!");
                     return;
                 }
 
                 if (f2.createNewFile())
                 {
-                    Util.logger.fine("Created file '" + f2.getAbsolutePath()
-                            + "'.");
+                    Util.logger.fine("Created file '" + f2.getAbsolutePath() + "'.");
                 }
             }
             in = new FileInputStream(f1);
@@ -185,8 +160,7 @@ public class Util
                 }
                 catch (IOException e)
                 {
-                    Util.logger.log(Level.SEVERE,
-                            "Failed to close input stream!", e);
+                    Util.logger.log(Level.SEVERE, "Failed to close input stream!", e);
                 }
             }
 
@@ -198,8 +172,7 @@ public class Util
                 }
                 catch (IOException e)
                 {
-                    Util.logger.log(Level.SEVERE,
-                            "Failed to close output stream!", e);
+                    Util.logger.log(Level.SEVERE, "Failed to close output stream!", e);
                 }
             }
         }
@@ -207,9 +180,8 @@ public class Util
 
     /**
      * Return the index matching the specified String or -1 if not found.
-     * 
-     * @param search
-     *            The String to search for
+     *
+     * @param search The String to search for
      * @return The index of the TString object
      */
     public static int getIndex(String search)
@@ -226,7 +198,7 @@ public class Util
 
     /**
      * Searches for unoccupied indexes and returns the first it can find.
-     * 
+     *
      * @return The first free index
      */
     public static int getNextFreeTStringsIndex()
@@ -250,7 +222,7 @@ public class Util
     /**
      * Filters the files that are to be parsed out of the directories specified
      * by {@link TStringGlobals#searchDirs}
-     * 
+     *
      * @return The files to be parsed.
      */
     public static File[] getParseFiles()
@@ -259,9 +231,7 @@ public class Util
         boolean tStringFound = false;
         for (String search : TStringGlobals.searchDirs)
         {
-            File searchDir =
-                    new File(TStringConfig.getRootDir().getAbsolutePath()
-                            + search);
+            File searchDir = new File(TStringConfig.getRootDir().getAbsolutePath() + search);
             if (searchDir.exists())
             {
                 File[] searchFiles = searchDir.listFiles(new FilenameFilter()
@@ -288,14 +258,13 @@ public class Util
             }
             else
             {
-                System.err.println("The directory '"
-                        + searchDir.getAbsolutePath() + "' does not exist.");
+                System.err.println("The directory '" + searchDir.getAbsolutePath() + "' does not exist.");
             }
         }
         if (TStringConfig.getMode() == Mode.UPDATE && !tStringFound)
         {
-            System.out
-                    .println("'update' mode was specified but there was no TStrings table found. Switching back to 'create'");
+            System.out.println(
+                    "'update' mode was specified but there was no TStrings table found. Switching back to 'create'");
             TStringConfig.setMode(Mode.CREATE);
         }
         File[] parseArray = new File[parseFiles.size()];
@@ -308,7 +277,7 @@ public class Util
 
     public static boolean isTranslateFile(String name)
     {
-        final String[] exts = { ".tbl", ".tbm", ".fs2", ".fc2" };
+        final String[] exts = {".tbl", ".tbm", ".fs2", ".fc2"};
 
         for (String ext : exts)
         {
@@ -334,11 +303,9 @@ public class Util
             }
             if (i > 0)
             {
-                if (current.getIndex()
-                        - TStringGlobals.tstrings.get(i - 1).getIndex() > 1)
+                if (current.getIndex() - TStringGlobals.tstrings.get(i - 1).getIndex() > 1)
                 {
-                    current.setIndex(TStringGlobals.tstrings.get(i - 1)
-                            .getIndex() + 1);
+                    current.setIndex(TStringGlobals.tstrings.get(i - 1).getIndex() + 1);
                 }
             }
         }
@@ -346,12 +313,10 @@ public class Util
 
     /**
      * Reads the contents of a file
-     * 
-     * @param file
-     *            The file this function reads from.
+     *
+     * @param file The file this function reads from.
      * @return The contents or null on error.
-     * @throws IOException
-     *             If the file cannot be read or something similar
+     * @throws IOException If the file cannot be read or something similar
      */
     public static String readFile(File file) throws IOException
     {
@@ -385,42 +350,34 @@ public class Util
             }
             else
             {
-                throw new IOException("File " + file.getPath()
-                        + " is not readable.");
+                throw new IOException("File " + file.getPath() + " is not readable.");
             }
         }
         else
         {
-            throw new FileNotFoundException("File " + file.getPath()
-                    + " does not exist.");
+            throw new FileNotFoundException("File " + file.getPath() + " does not exist.");
         }
     }
 
     /**
      * Writes content to a file
-     * 
-     * @param content
-     *            The content to be written
-     * @param file
-     *            The file that is beeing written
-     * @throws IOException
-     *             If something goes wrong
+     *
+     * @param content The content to be written
+     * @param file    The file that is beeing written
+     * @throws IOException If something goes wrong
      */
     public static void write(String content, File file) throws IOException
     {
         if (!file.exists())
         {
-            if (!file.getParentFile().exists()
-                    && !file.getParentFile().mkdirs())
+            if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
             {
-                Util.logger.severe("Couldn't create directory '"
-                        + file.getParent() + "'!");
+                Util.logger.severe("Couldn't create directory '" + file.getParent() + "'!");
                 return;
             }
             if (file.createNewFile())
             {
-                Util.logger.fine("Created file '" + file.getAbsolutePath()
-                        + "'.");
+                Util.logger.fine("Created file '" + file.getAbsolutePath() + "'.");
             }
         }
         FileWriter writer = null;

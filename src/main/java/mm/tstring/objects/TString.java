@@ -4,29 +4,26 @@ import java.util.logging.Logger;
 
 /**
  * Class to represent an entry in tstrings.tbl
- * 
+ *
  * @author m!m
  */
 public class TString implements Comparable<TString>
 {
 
-    private static final Logger logger   = Logger.getLogger(TString.class
-                                                 .getName());
+    private static final Logger logger = Logger.getLogger(TString.class.getName());
 
-    private boolean             editable = true;
+    private boolean editable = true;
 
-    private int                 index    = -1;
+    private int index = -1;
 
-    private String              value    = null;
+    private String value = null;
 
     /**
      * The constructor constructs a <code>TString</code>-object with the
      * specified index and value.
-     * 
-     * @param value
-     *            The <code>String</code> value of this TString
-     * @param index
-     *            The index.
+     *
+     * @param value The <code>String</code> value of this TString
+     * @param index The index.
      */
     public TString(String value, int index)
     {
@@ -37,13 +34,10 @@ public class TString implements Comparable<TString>
     /**
      * Constructs a TString object with the aditional option to specify if it is
      * editable.
-     * 
-     * @param value
-     *            String valie
-     * @param index
-     *            The index
-     * @param editable
-     *            Sets this object to be editable or not.
+     *
+     * @param value    String valie
+     * @param index    The index
+     * @param editable Sets this object to be editable or not.
      */
     public TString(String value, int index, boolean editable)
     {
@@ -102,7 +96,7 @@ public class TString implements Comparable<TString>
 
     /**
      * Gets the index of this object
-     * 
+     *
      * @return The index
      */
     public int getIndex()
@@ -112,7 +106,7 @@ public class TString implements Comparable<TString>
 
     /**
      * Gets the value of this object
-     * 
+     *
      * @return The value
      */
     public String getValue()
@@ -141,12 +135,9 @@ public class TString implements Comparable<TString>
 
     /**
      * Sets the new index.
-     * 
-     * @param index
-     *            The new index
-     * 
-     * @throws IllegalArgumentException
-     *             When the index is < -1
+     *
+     * @param index The new index
+     * @throws IllegalArgumentException When the index is < -1
      */
     public void setIndex(int index)
     {
@@ -156,17 +147,15 @@ public class TString implements Comparable<TString>
         }
         else
         {
-            TString.logger.warning("Found illegal value '" + index
-                    + "'. Setting it to -1.");
+            TString.logger.warning("Found illegal value '" + index + "'. Setting it to -1.");
             this.index = -1;
         }
     }
 
     /**
      * Sets the new value of this object
-     * 
-     * @param value
-     *            The new <code>String</code> value.
+     *
+     * @param value The new <code>String</code> value.
      */
     public void setValue(String value)
     {

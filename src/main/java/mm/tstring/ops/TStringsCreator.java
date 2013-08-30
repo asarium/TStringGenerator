@@ -1,5 +1,10 @@
 package mm.tstring.ops;
 
+import mm.tstring.config.TStringConfig;
+import mm.tstring.objects.TString;
+import mm.tstring.util.TStringGlobals;
+import mm.tstring.util.Util;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -11,14 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
-import mm.tstring.config.TStringConfig;
-import mm.tstring.objects.TString;
-import mm.tstring.util.TStringGlobals;
-import mm.tstring.util.Util;
-
 /**
  * @author m!m
- * 
  */
 public class TStringsCreator extends TStringOperation
 {
@@ -42,8 +41,7 @@ public class TStringsCreator extends TStringOperation
                 {
                     String content = Util.readFile(this.file);
 
-                    Matcher contentMatcher = TStringGlobals.tstringPattern
-                            .matcher(content);
+                    Matcher contentMatcher = TStringGlobals.tstringPattern.matcher(content);
 
                     while (contentMatcher.find())
                     {
@@ -57,8 +55,7 @@ public class TStringsCreator extends TStringOperation
                         catch (NumberFormatException e)
                         {
                             TStringsCreator.logger.log(Level.SEVERE,
-                                    "Malformatted index element: '"
-                                            + contentMatcher.group(2) + "'.");
+                                    "Malformatted index element: '" + contentMatcher.group(2) + "'.");
                             continue;
                         }
 
@@ -67,8 +64,7 @@ public class TStringsCreator extends TStringOperation
                 }
                 catch (IOException e)
                 {
-                    System.err.println("Exception while reading file "
-                            + this.file.getPath());
+                    System.err.println("Exception while reading file " + this.file.getPath());
                     e.printStackTrace();
                 }
             }
@@ -91,15 +87,13 @@ public class TStringsCreator extends TStringOperation
         {
             if (!this.file.getName().equals("tstrings.tbl"))
             {
-                System.out.println("Updating file: "
-                        + this.file.getAbsolutePath());
+                System.out.println("Updating file: " + this.file.getAbsolutePath());
                 try
                 {
                     String contentStr = Util.readFile(this.file);
                     StringBuilder content = new StringBuilder(contentStr);
 
-                    Matcher contentMatcher = TStringGlobals.tstringPattern
-                            .matcher(contentStr);
+                    Matcher contentMatcher = TStringGlobals.tstringPattern.matcher(contentStr);
 
                     int num = 0;
                     while (contentMatcher.find())
@@ -109,14 +103,12 @@ public class TStringsCreator extends TStringOperation
 
                         if (index < 0)
                         {
-                            TStringsCreator.logger
-                                    .warning("Couldn't find index for value '"
-                                            + value + "'! Using -1 instead.");
+                            TStringsCreator.logger.warning(
+                                    "Couldn't find index for value '" + value + "'! Using -1 instead.");
                         }
 
-                        content.replace(contentMatcher.start(),
-                                contentMatcher.end(),
-                                String.format("XSTR(\"%s\", %d)", value, index));
+                        content.replace(contentMatcher.start(), contentMatcher.end(), String.format("XSTR(\"%s\", %d)",
+                                value, index));
 
                         num++;
 
@@ -139,11 +131,9 @@ public class TStringsCreator extends TStringOperation
         }
     }
 
-    private static final String[] ignoredFiles = { "tstrings.tbl",
-            "strings.tbl"                     };
+    private static final String[] ignoredFiles = {"tstrings.tbl", "strings.tbl"};
 
-    private static final Logger   logger       = Logger.getLogger(TStringsCreator.class
-                                                       .getName());
+    private static final Logger logger = Logger.getLogger(TStringsCreator.class.getName());
 
     public TStringsCreator(File root, File backup)
     {
@@ -154,20 +144,16 @@ public class TStringsCreator extends TStringOperation
     {
         if (!this.backup.exists() && !this.backup.mkdirs())
         {
-            TStringsCreator.logger.severe("Could not create '"
-                    + this.backup.getAbsolutePath()
-                    + "'! Aborting operation...");
+            TStringsCreator.logger.severe(
+                    "Could not create '" + this.backup.getAbsolutePath() + "'! Aborting operation...");
             return false;
         }
 
         for (File file : files)
         {
             System.out.println("Backup in progress: " + file.getPath());
-            Util.copyfile(
-                    file.getAbsolutePath(),
-                    this.backup.getAbsolutePath() + "/"
-                            + file.getParentFile().getName() + "/"
-                            + file.getName());
+            Util.copyfile(file.getAbsolutePath(),
+                    this.backup.getAbsolutePath() + "/" + file.getParentFile().getName() + "/" + file.getName());
         }
 
         return true;
@@ -188,9 +174,8 @@ public class TStringsCreator extends TStringOperation
 
     /**
      * Creates a new tstrings.tbl overwriting the former one.
-     * 
-     * @param files
-     *            The files where the TStrings will be extracted
+     *
+     * @param files The files where the TStrings will be extracted
      */
     @Override
     public boolean makeTString(File[] files)
@@ -213,8 +198,7 @@ public class TStringsCreator extends TStringOperation
 
     private void parseFiles(File[] files)
     {
-        ExecutorService exec = Executors.newFixedThreadPool(Runtime
-                .getRuntime().availableProcessors());
+        ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         for (File file : files)
         {
@@ -242,8 +226,7 @@ public class TStringsCreator extends TStringOperation
 
     private void updateFiles(File[] files)
     {
-        ExecutorService exec = Executors.newFixedThreadPool(Runtime
-                .getRuntime().availableProcessors());
+        ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         for (File file : files)
         {
@@ -293,12 +276,10 @@ public class TStringsCreator extends TStringOperation
             content.append("\"\n\n");
         }
         content.append("#end");
-        File tstrings = new File(this.root.getAbsolutePath()
-                + "/data/tables/tstrings.tbl");
+        File tstrings = new File(this.root.getAbsolutePath() + "/data/tables/tstrings.tbl");
         if (tstrings.exists() && !TStringConfig.isNoBackup())
         {
-            Util.copyfile(tstrings.getAbsolutePath(), TStringConfig.getBackupDir()
-                    + "/tstrings.tbl");
+            Util.copyfile(tstrings.getAbsolutePath(), TStringConfig.getBackupDir() + "/tstrings.tbl");
         }
         try
         {

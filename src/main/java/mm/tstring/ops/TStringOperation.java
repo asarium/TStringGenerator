@@ -6,7 +6,7 @@ public abstract class TStringOperation
 {
     protected File backup = null;
 
-    protected File root   = null;
+    protected File root = null;
 
     public TStringOperation(File root, File backup)
     {

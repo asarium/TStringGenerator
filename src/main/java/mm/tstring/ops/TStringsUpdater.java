@@ -1,13 +1,13 @@
 package mm.tstring.ops;
 
-import java.io.File;
-
 import mm.tstring.config.TStringConfig;
 import mm.tstring.config.TStringConfig.Mode;
 
+import java.io.File;
+
 /**
  * Class to update an existing tstrings.tbl
- * 
+ *
  * @author m!m
  */
 public class TStringsUpdater extends TStringOperation
@@ -22,15 +22,13 @@ public class TStringsUpdater extends TStringOperation
      * Updates the table based on the given input files.<br>
      * <br>
      * <i>This isn't doing anything currently</i>
-     * 
-     * @param inputFiles
-     *            The files which will be parsed.
+     *
+     * @param inputFiles The files which will be parsed.
      */
     @Override
     public boolean makeTString(File[] inputFiles)
     {
-        File tstrings = new File(TStringConfig.getRootDir().getAbsolutePath()
-                + "/data/tables/tstrings.tbl");
+        File tstrings = new File(TStringConfig.getRootDir().getAbsolutePath() + "/data/tables/tstrings.tbl");
         if (tstrings.exists())
         {
 
@@ -39,8 +37,7 @@ public class TStringsUpdater extends TStringOperation
         {
             System.err.println("No TStrings table found. Going to 'create'.");
             TStringConfig.setMode(Mode.CREATE);
-            new TStringsCreator(TStringConfig.getRootDir(), TStringConfig.getBackupDir())
-                    .makeTString(inputFiles);
+            new TStringsCreator(TStringConfig.getRootDir(), TStringConfig.getBackupDir()).makeTString(inputFiles);
         }
 
         return true;
