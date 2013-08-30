@@ -1,8 +1,7 @@
 package mm.tstring.config;
 
-import mm.tstring.config.TStringConfig.Mode;
-
 import com.beust.jcommander.IStringConverter;
+import mm.tstring.config.TStringConfig.Mode;
 
 public class ModeConverter implements IStringConverter<Mode>
 {
