@@ -1,5 +1,7 @@
-
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "mm.tstring.TStringGenerator"
 
 repositories {
     mavenCentral()
