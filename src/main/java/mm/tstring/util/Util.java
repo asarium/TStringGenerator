@@ -98,6 +98,26 @@ public class Util
         }
     }
 
+    public static <T extends Comparable<T>> int compare(T o1, T o2)
+    {
+        if (o1 == o2)
+        {
+            return 0;
+        }
+        else if (o1 == null)
+        {
+            return -1;
+        }
+        else if (o2 == null)
+        {
+            return 1;
+        }
+        else
+        {
+            return o1.compareTo(o2);
+        }
+    }
+
     /**
      * Copies <code>srFile</code> to <code>dtFile</code>
      *
@@ -176,6 +196,16 @@ public class Util
                 }
             }
         }
+    }
+
+    public static String getExtension(String name)
+    {
+        if (name == null)
+        {
+            throw new IllegalArgumentException("name");
+        }
+
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 
     /**
@@ -326,27 +356,27 @@ public class Util
             {
                 StringBuilder content = new StringBuilder();
 
-                FileReader reader = new FileReader(file);
-                BufferedReader input = new BufferedReader(reader);
-                String line = null;
-
-                while ((line = input.readLine()) != null)
+                BufferedReader input = null;
+                try
                 {
-                    content.append(line);
-                    content.append("\n");
+                    input = new BufferedReader(new FileReader(file));
+                    char[] buffer = new char[1024];
+                    int n;
+
+                    while ((n = input.read(buffer)) != -1)
+                    {
+                        content.append(buffer, 0, n);
+                    }
+                }
+                finally
+                {
+                    if (input != null)
+                    {
+                        input.close();
+                    }
                 }
 
-                input.close();
-                reader.close();
-
-                if (content.length() > 0)
-                {
-                    return content.substring(0, content.length() - 1);
-                }
-                else
-                {
-                    return content.toString();
-                }
+                return content.toString();
             }
             else
             {

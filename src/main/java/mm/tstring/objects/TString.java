@@ -1,5 +1,7 @@
 package mm.tstring.objects;
 
+import mm.tstring.util.Util;
+
 import java.util.logging.Logger;
 
 /**
@@ -11,6 +13,8 @@ public class TString implements Comparable<TString>
 {
 
     private static final Logger logger = Logger.getLogger(TString.class.getName());
+
+    private boolean immutable = false;
 
     private int index = -1;
 
@@ -29,6 +33,13 @@ public class TString implements Comparable<TString>
         this.setIndex(index);
     }
 
+    public TString(int index, String value, boolean immutable)
+    {
+        this.index = index;
+        this.value = value;
+        this.immutable = immutable;
+    }
+
     @Override
     public int compareTo(TString o)
     {
@@ -44,7 +55,7 @@ public class TString implements Comparable<TString>
 
         if (this.getIndex() == o.getIndex())
         {
-            return 0;
+            return Util.compare(this.getValue(), o.getValue());
         }
 
         if (this.getIndex() > o.getIndex())
@@ -55,24 +66,34 @@ public class TString implements Comparable<TString>
         return 0;
     }
 
-    @Override
-    public boolean equals(Object obj)
+    /**
+     * Gets the value of this object
+     *
+     * @return The value
+     */
+    public String getValue()
     {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (obj == null)
-        {
-            return false;
-        }
-        if (this.getClass() != obj.getClass())
-        {
-            return false;
-        }
-        TString other = (TString) obj;
+        return this.value;
+    }
 
-        return this.index == other.index;
+    /**
+     * Sets the new value of this object
+     *
+     * @param value The new <code>String</code> value.
+     */
+    public void setValue(String value)
+    {
+        if (isImmutable())
+        {
+            throw new UnsupportedOperationException("Object is immutable");
+        }
+
+        this.value = value;
+    }
+
+    public boolean isImmutable()
+    {
+        return immutable;
     }
 
     /**
@@ -86,25 +107,6 @@ public class TString implements Comparable<TString>
     }
 
     /**
-     * Gets the value of this object
-     *
-     * @return The value
-     */
-    public String getValue()
-    {
-        return this.value;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + this.index;
-        return result;
-    }
-
-    /**
      * Sets the new index.
      *
      * @param index The new index
@@ -112,6 +114,11 @@ public class TString implements Comparable<TString>
      */
     public void setIndex(int index)
     {
+        if (isImmutable())
+        {
+            throw new UnsupportedOperationException("Object is immutable");
+        }
+
         if (index >= -1)
         {
             this.index = index;
@@ -123,13 +130,33 @@ public class TString implements Comparable<TString>
         }
     }
 
-    /**
-     * Sets the new value of this object
-     *
-     * @param value The new <code>String</code> value.
-     */
-    public void setValue(String value)
+    @Override
+    public int hashCode()
     {
-        this.value = value;
+        int result = index;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof TString))
+        {
+            return false;
+        }
+
+        TString tString = (TString) o;
+
+        if (index != tString.index)
+        {
+            return false;
+        }
+
+        return !(value != null ? !value.equals(tString.value) : tString.value != null);
     }
 }

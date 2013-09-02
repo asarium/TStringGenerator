@@ -13,22 +13,13 @@ import java.util.regex.Pattern;
  */
 public class TStringGlobals
 {
-    public final static String applicationName = "@APP_NAME@";
-
-    /**
-     * The version of the generator
-     */
-    public final static String applicationVersion = "@APP_VERSION@";
+    public final static String applicationName = "tstrings";
 
     /**
      * The program will search for the files in these directories
      */
     public static final String[] searchDirs = {"/data/tables", "/data/missions"};
 
-    /**
-     * The regexp-Pattern to match a XSTR-statement (thanks to Spicious).
-     * Updated version provided by Goober5000
-     */
     public static final Pattern tstringPattern = Pattern.compile("XSTR\\s*\\(\\s*\"([^\"]*)\"\\s*,\\s*(-?\\d+)\\s*\\)");
 
     /**
