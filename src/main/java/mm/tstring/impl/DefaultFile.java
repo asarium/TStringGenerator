@@ -53,4 +53,32 @@ public class DefaultFile implements IFile
 
         Util.write(content, file);
     }
+
+    @Override
+    public int hashCode()
+    {
+        return file != null ? file.hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof DefaultFile))
+        {
+            return false;
+        }
+
+        DefaultFile that = (DefaultFile) o;
+
+        if (file != null ? !file.equals(that.file) : that.file != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
