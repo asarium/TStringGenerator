@@ -33,7 +33,7 @@ public class TString implements Comparable<TString>
         this.setIndex(index);
     }
 
-    public TString(int index, String value, boolean immutable)
+    public TString(String value, int index, boolean immutable)
     {
         this.index = index;
         this.value = value;
@@ -64,36 +64,6 @@ public class TString implements Comparable<TString>
         }
 
         return 0;
-    }
-
-    /**
-     * Gets the value of this object
-     *
-     * @return The value
-     */
-    public String getValue()
-    {
-        return this.value;
-    }
-
-    /**
-     * Sets the new value of this object
-     *
-     * @param value The new <code>String</code> value.
-     */
-    public void setValue(String value)
-    {
-        if (isImmutable())
-        {
-            throw new UnsupportedOperationException("Object is immutable");
-        }
-
-        this.value = value;
-    }
-
-    public boolean isImmutable()
-    {
-        return immutable;
     }
 
     /**
@@ -128,6 +98,36 @@ public class TString implements Comparable<TString>
             TString.logger.warning("Found illegal value '" + index + "'. Setting it to -1.");
             this.index = -1;
         }
+    }
+
+    /**
+     * Gets the value of this object
+     *
+     * @return The value
+     */
+    public String getValue()
+    {
+        return this.value;
+    }
+
+    /**
+     * Sets the new value of this object
+     *
+     * @param value The new <code>String</code> value.
+     */
+    public void setValue(String value)
+    {
+        if (isImmutable())
+        {
+            throw new UnsupportedOperationException("Object is immutable");
+        }
+
+        this.value = value;
+    }
+
+    public boolean isImmutable()
+    {
+        return immutable;
     }
 
     @Override
