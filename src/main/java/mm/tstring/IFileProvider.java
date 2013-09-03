@@ -6,5 +6,5 @@ public interface IFileProvider
 
     public Iterable<IFile> getFiles();
 
-    public IFile getTStringTable();
+    public IFile getTStringTable(boolean create);
 }
