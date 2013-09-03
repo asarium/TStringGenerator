@@ -5,7 +5,9 @@ import mm.tstring.IFileProvider;
 import mm.tstring.util.Util;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +34,28 @@ public class ModDirecotryFileProvider implements IFileProvider
     }
 
     @Override
+    public boolean backupFiles()
+    {
+        URI rootURI = modRootDirecotry.toURI();
+
+        for (File f : getFilesystemFiles())
+        {
+            URI relativize = rootURI.relativize(f.toURI());
+
+            URI backupURI = rootURI.resolve("/backup").resolve(relativize);
+
+            File backupFile = new File(backupURI);
+
+            if (!Util.copyFile(f, backupFile))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public Iterable<IFile> getFiles()
     {
         if (!modRootDirecotry.isDirectory())
@@ -40,6 +64,34 @@ public class ModDirecotryFileProvider implements IFileProvider
         }
 
         List<IFile> files = new ArrayList<IFile>();
+
+        for (File f : getFilesystemFiles())
+        {
+            files.add(new DefaultFile(f));
+        }
+
+        return files;
+    }
+
+    @Override
+    public IFile getTStringTable()
+    {
+        // the table should be located there
+        File table = new File(modRootDirecotry, "data/tables/tstrings.tbl");
+
+        if (table.isFile())
+        {
+            return new DefaultFile(table);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private Collection<File> getFilesystemFiles()
+    {
+        List<File> files = new ArrayList<File>();
 
         for (String searchDir : searchPaths)
         {
@@ -55,7 +107,7 @@ public class ModDirecotryFileProvider implements IFileProvider
                     {
                         if (extension.equalsIgnoreCase(ext))
                         {
-                            files.add(new DefaultFile(f));
+                            files.add(f);
                             break;
                         }
                     }
