@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ModDirecotryFileProvider implements IFileProvider
+public class ModDirectoryFileProvider implements IFileProvider
 {
     private static final String[] fileExtensions = {"fs2, fc2", "tbl", "tbm"};
 
@@ -19,7 +19,7 @@ public class ModDirecotryFileProvider implements IFileProvider
 
     private File modRootDirecotry;
 
-    public ModDirecotryFileProvider(File modRootDirecotry)
+    public ModDirectoryFileProvider(File modRootDirecotry)
     {
         if (modRootDirecotry == null)
         {

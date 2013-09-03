@@ -5,6 +5,7 @@ import mm.tstring.config.TStringConfig.Mode;
 import mm.tstring.objects.TString;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -121,81 +122,94 @@ public class Util
     /**
      * Copies <code>srFile</code> to <code>dtFile</code>
      *
-     * @param srFile The source file to be copied.
-     * @param dtFile The destination
+     * @param srcFile The source file to be copied.
+     * @param dstFile The destination
      */
-    public static void copyfile(String srFile, String dtFile)
+    public static boolean copyFile(File srcFile, File dstFile)
     {
-        InputStream in = null;
-        OutputStream out = null;
+        if (!srcFile.isFile())
+        {
+            logger.warning("'" + srcFile.getAbsolutePath() + "' is no file!");
+            return false;
+        }
+
+        if (!dstFile.exists())
+        {
+            if (!dstFile.getParentFile().mkdirs())
+            {
+                logger.warning("Failed to create directory '" + dstFile.getParent() + "'!");
+                return false;
+            }
+
+            try
+            {
+                if (dstFile.createNewFile())
+                {
+                    logger.fine("Created file '" + dstFile.getAbsolutePath() + "'.");
+                }
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.WARNING, "Failed to create file '" + dstFile.getAbsolutePath() + "'!", e);
+                return false;
+            }
+        }
+        else if (!dstFile.isFile())
+        {
+            logger.warning("Destination file '" + dstFile.getAbsolutePath() + "' already exists but is no file!");
+            return false;
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
         try
         {
-            File f1 = new File(srFile);
-            File f2 = new File(dtFile);
-            if (!f2.exists())
-            {
-                File parent = f2.getParentFile();
-                if (!parent.exists() && !parent.mkdirs())
-                {
-                    Util.logger.severe("Coudln't create directory '" + parent.getAbsolutePath() + "'!");
-                    return;
-                }
+            source = new FileInputStream(srcFile).getChannel();
+            destination = new FileOutputStream(dstFile).getChannel();
 
-                if (f2.createNewFile())
-                {
-                    Util.logger.fine("Created file '" + f2.getAbsolutePath() + "'.");
-                }
-            }
-            in = new FileInputStream(f1);
-
-            // For Overwrite the file.
-            out = new FileOutputStream(f2);
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0)
-            {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
+            destination.transferFrom(source, 0, source.size());
         }
         catch (FileNotFoundException e)
         {
-            e.printStackTrace();
-            return;
+            // This should not happen
+            logger.log(Level.SEVERE, "Failed to find file!", e);
+            return false;
         }
         catch (IOException e)
         {
-            e.printStackTrace();
-            return;
+            logger.log(Level.SEVERE, "Failed to copy file!", e);
+            return false;
         }
         finally
         {
-            if (in != null)
+            if (source != null)
             {
                 try
                 {
-                    in.close();
+                    source.close();
                 }
                 catch (IOException e)
                 {
-                    Util.logger.log(Level.SEVERE, "Failed to close input stream!", e);
+                    logger.log(Level.SEVERE,
+                            "Failed to close file channel from file '" + srcFile.getAbsolutePath() + "'!", e);
                 }
             }
 
-            if (out != null)
+            if (destination != null)
             {
                 try
                 {
-                    out.close();
+                    destination.close();
                 }
                 catch (IOException e)
                 {
-                    Util.logger.log(Level.SEVERE, "Failed to close output stream!", e);
+                    logger.log(Level.SEVERE,
+                            "Failed to close file channel from file '" + dstFile.getAbsolutePath() + "'!", e);
                 }
             }
         }
+
+        return true;
     }
 
     public static String getExtension(String name)
