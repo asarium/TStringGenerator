@@ -1,8 +1,8 @@
 package mm.tstring.impl;
 
-import junit.framework.Assert;
 import mm.tstring.MemoryFile;
 import mm.tstring.objects.FileTString;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
