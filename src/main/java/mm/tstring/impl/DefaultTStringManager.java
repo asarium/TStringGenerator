@@ -13,7 +13,30 @@ import java.util.logging.Logger;
 
 public class DefaultTStringManager implements ITStringManager
 {
-    private static class TStringComparator implements Comparator<TString>
+    private static class TStringIndexComparator implements Comparator<TString>
+    {
+
+        @Override
+        public int compare(TString o1, TString o2)
+        {
+            if (o1 == o2)
+            {
+                return 0;
+            }
+            else if (o1 == null)
+            {
+                return -1;
+            }
+            else if (o2 == null)
+            {
+                return 1;
+            }
+
+            return Integer.compare(o1.getIndex(), o2.getIndex());
+        }
+    }
+
+    private static class TStringValueComparator implements Comparator<TString>
     {
 
         @Override
@@ -47,7 +70,9 @@ public class DefaultTStringManager implements ITStringManager
 
     private static final Logger logger = Logger.getLogger(DefaultTStringManager.class.getName());
 
-    private Set<TString> sortedTStrings;
+    private NavigableSet<TString> indexSortedTStrings;
+
+    private NavigableSet<TString> valueSortedTStrings;
 
     @Override
     public void collectTStrings(ITstringParser parser, IFileProvider fileProvider)
@@ -61,7 +86,7 @@ public class DefaultTStringManager implements ITStringManager
             throw new IllegalArgumentException("fileProvider");
         }
 
-        sortedTStrings = buildTStringsSet(parseTStrings(parser, fileProvider));
+        buildTStringsSets(parseTStrings(parser, fileProvider));
     }
 
     private Collection<FileTString> parseTStrings(ITstringParser parser, IFileProvider fileProvider)
@@ -82,7 +107,7 @@ public class DefaultTStringManager implements ITStringManager
     @Override
     public Collection<TString> getTStrings()
     {
-        return sortedTStrings;
+        return indexSortedTStrings;
     }
 
     @Override
@@ -91,32 +116,97 @@ public class DefaultTStringManager implements ITStringManager
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private Set<TString> buildTStringsSet(Collection<FileTString> fileStrings)
+    private void buildTStringsSets(Collection<FileTString> fileStrings)
     {
         // We use a special comparator to make two TStrings equal when their contents match
-        NavigableSet<TString> tstringSet = new TreeSet<TString>(new TStringComparator());
+        valueSortedTStrings = new TreeSet<TString>(new TStringValueComparator());
+        indexSortedTStrings = new TreeSet<TString>(new TStringIndexComparator());
 
         for (FileTString fileTString : fileStrings)
         {
             // Add a clean TString instance here
-            TString string = new TString(fileTString.getValue(), fileTString.getIndex());
-            if (!tstringSet.add(string))
-            {
-                // The set already contains a string with the same string value
-                SortedSet<TString> headSet = tstringSet.headSet(string, true);
+            addTString(new TString(fileTString.getValue(), fileTString.getIndex()));
+        }
+    }
 
-                // Check if the indexes match
-                if (headSet.last().getIndex() != string.getIndex())
-                {
-                    // We have an index mismatch with the same content
-                    logger.warning(String.format(
-                            "String \"%s\" has mismatching indexes! Found indexes %d and %d. Keeping first",
-                            string.getValue(), headSet.last().getIndex(), string.getIndex()));
-                }
-            }
-
+    private void addTString(TString string)
+    {
+        if (string.isImmutable())
+        {
+            throw new IllegalArgumentException("TString may not be immutable!");
         }
 
-        return tstringSet;
+        if (string.getIndex() < 0)
+        {
+            string.setIndex(findNextFreeIndex());
+        }
+
+        // We can do this as the two sets use special comparators
+        boolean valueContained = valueSortedTStrings.contains(string);
+        boolean indexContained = indexSortedTStrings.contains(string);
+
+        if (!valueContained && !indexContained)
+        {
+            // This is a completely new string
+            valueSortedTStrings.add(string);
+            indexSortedTStrings.add(string);
+        }
+        else if (valueContained && !indexContained)
+        {
+            NavigableSet<TString> stringHeadSet = valueSortedTStrings.headSet(string, true);
+            logger.warning(String.format("Found duplicate string '%s' with different index %d and %d. Keeping first...",
+                    string.getValue(), stringHeadSet.last().getIndex(), string.getIndex()));
+        }
+        else if (!valueContained) // indexContained is always true here
+        {
+            logger.warning(String.format("Found duplicate index usage of %d. Fixing...", string.getIndex()));
+
+            // Set new index
+            string.setIndex(findNextFreeIndex());
+
+            // Now add it
+            valueSortedTStrings.add(string);
+            indexSortedTStrings.add(string);
+        }
+        else
+        {
+            // both already contained, simply check for errors
+            NavigableSet<TString> valueHeadSet = valueSortedTStrings.headSet(string, true);
+            NavigableSet<TString> indexHeadSet = indexSortedTStrings.headSet(string, true);
+
+            TString sameValue = valueHeadSet.last();
+            TString sameIndex = indexHeadSet.last();
+
+            if (!sameValue.equals(sameIndex))
+            {
+                logger.warning(String.format("Found mismatching TStrings!%n" +
+                        "String 1: XSTR(\"%s\", %d)%n" +
+                        "String 2: XSTR(\"%s\", %d)", sameIndex.getValue(), sameIndex.getIndex(), sameValue.getValue(),
+                        sameValue.getIndex()));
+            }
+        }
+    }
+
+    /**
+     * Searches {@link #indexSortedTStrings} for a free index by using a sequential search.
+     *
+     * @return The next free index
+     */
+    private int findNextFreeIndex()
+    {
+        int lastIndex = -1;
+        for (TString current : indexSortedTStrings)
+        {
+            int diff = current.getIndex() - lastIndex;
+
+            if (diff > 1)
+            {
+                return lastIndex + 1;
+            }
+
+            lastIndex = current.getIndex();
+        }
+
+        return lastIndex + 1;
     }
 }
