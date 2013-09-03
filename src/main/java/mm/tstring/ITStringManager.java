@@ -10,5 +10,5 @@ public interface ITStringManager
 
     public Collection<TString> getTStrings();
 
-    public void writeStrings(IFileProvider fileProvider);
+    public void writeStrings(ITstringParser parser, IFileProvider fileProvider);
 }

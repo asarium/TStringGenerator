@@ -8,7 +8,10 @@ import mm.tstring.objects.FileTString;
 import mm.tstring.objects.TString;
 import mm.tstring.util.Util;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DefaultTStringManager implements ITStringManager
@@ -55,16 +58,7 @@ public class DefaultTStringManager implements ITStringManager
                 return 1;
             }
 
-            int strResult = Util.compare(o1.getValue(), o2.getValue());
-
-            if (strResult == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return o1.compareTo(o2);
-            }
+            return Util.compare(o1.getValue(), o2.getValue());
         }
     }
 
@@ -159,7 +153,105 @@ public class DefaultTStringManager implements ITStringManager
     @Override
     public void writeStrings(ITstringParser parser, IFileProvider fileProvider)
     {
+        if (!fileProvider.backupFiles())
+        {
+            logger.warning("Failed to create backups, no files will be changed.");
+            return;
+        }
 
+        Map<IFile, Collection<FileTString>> tstringMapping = new HashMap<IFile, Collection<FileTString>>();
+
+        for (IFile file : fileProvider.getFiles())
+        {
+            tstringMapping.put(file, parser.parseStrings(file));
+        }
+
+        replaceContents(tstringMapping);
+
+        IFile tstringsTable = fileProvider.getTStringTable(true);
+
+        if (tstringsTable != null)
+        {
+            writeTable(tstringsTable);
+        }
+        else
+        {
+            logger.info("Failed to create tstring.tbl!");
+        }
+    }
+
+    private void replaceContents(Map<IFile, Collection<FileTString>> tstringMapping)
+    {
+        for (Map.Entry<IFile, Collection<FileTString>> entry : tstringMapping.entrySet())
+        {
+            logger.info("Replacing strings in \"" + entry.getKey().getName() + "\".");
+
+            try
+            {
+                StringBuilder contentBuilder = new StringBuilder(entry.getKey().getContent());
+
+                long currentOffset = 0;
+
+                for (FileTString tstring : entry.getValue())
+                {
+                    NavigableSet<TString> headSet = valueSortedTStrings.headSet(tstring, true);
+
+                    TString last = headSet.last();
+
+                    if (!last.getValue().equals(tstring.getValue()))
+                    {
+                        logger.warning(
+                                "TString with content '" + tstring.getValue() + "' and index " + tstring.getIndex() +
+                                        " wasn't found in parsed TString list!");
+                    }
+                    else
+                    {
+                        String newContent = String.format("XSTR(\"%s\", %d)", last.getValue(), last.getIndex());
+
+                        int begin = (int) (tstring.getOffset() + currentOffset);
+                        int end = (int) (begin + tstring.getLength());
+
+                        // Recompute offset
+                        currentOffset = currentOffset + newContent.length() - tstring.getLength();
+
+                        contentBuilder.replace(begin, end, newContent);
+                    }
+                }
+
+                entry.getKey().writeContent(contentBuilder.toString());
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.WARNING, "Failed to update contents of file '" + entry.getKey().getName() + "'.", e);
+            }
+        }
+    }
+
+    private void writeTable(IFile tStringTable)
+    {
+        PrintStream stream = null;
+        try
+        {
+            stream = new PrintStream(tStringTable.openOutputStream(), true);
+
+            stream.println("#default");
+            for (TString string : indexSortedTStrings)
+            {
+                stream.printf("%d, \"%s\"%n%n", string.getIndex(), string.getValue());
+            }
+            stream.println("#end");
+        }
+        catch (IOException e)
+        {
+            logger.log(Level.SEVERE, "Error while writing TStrings table!", e);
+        }
+        finally
+        {
+            if (stream != null)
+            {
+                stream.close();
+            }
+        }
     }
 
     private void buildTStringsSets(Collection<FileTString> fileStrings)
