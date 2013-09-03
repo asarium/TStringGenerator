@@ -47,18 +47,6 @@ public class TStringConfig
         return TStringConfig.getInstance().backupDir;
     }
 
-    private static TStringConfig getInstance()
-    {
-        if (TStringConfig.INSTANCE == null)
-        {
-            return new TStringConfig();
-        }
-        else
-        {
-            return TStringConfig.INSTANCE;
-        }
-    }
-
     /**
      * Sets a new backupdirectory
      *
@@ -80,6 +68,18 @@ public class TStringConfig
             }
         }
         TStringConfig.getInstance().backupDir = backupDir;
+    }
+
+    private static TStringConfig getInstance()
+    {
+        if (TStringConfig.INSTANCE == null)
+        {
+            return new TStringConfig();
+        }
+        else
+        {
+            return TStringConfig.INSTANCE;
+        }
     }
 
     /**
@@ -106,10 +106,7 @@ public class TStringConfig
 
     /**
      * This function initializes all necessary variables based on the
-     * commandline.<br>
-     * <br>
-     * This is powered by the java library <a
-     * href="http://jcmdline.sourceforge.net/">jcmdline</a>
+     * commandline.
      *
      * @param args The commandline arguments
      */
@@ -141,11 +138,6 @@ public class TStringConfig
         TStringConfig.setBackupDir(new File(TStringConfig.getRootDir(), "backups").getAbsoluteFile());
 
         return true;
-    }
-
-    public static boolean needsHelp()
-    {
-        return TStringConfig.getInstance().help;
     }
 
     /**
@@ -180,6 +172,11 @@ public class TStringConfig
             }
         }
         TStringConfig.getInstance().rootDir = rootDir;
+    }
+
+    public static boolean needsHelp()
+    {
+        return TStringConfig.getInstance().help;
     }
 
     /**
