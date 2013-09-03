@@ -1,12 +1,16 @@
 package mm.tstring;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Abstraction around a file which can be read and written to.
  */
 public interface IFile
 {
+    public OutputStream openOutputStream() throws IOException;
+
     /**
      * Gets the contents of the file as a string.
      *

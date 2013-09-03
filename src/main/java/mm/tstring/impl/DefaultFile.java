@@ -3,8 +3,7 @@ package mm.tstring.impl;
 import mm.tstring.IFile;
 import mm.tstring.util.Util;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 public class DefaultFile implements IFile
 {
@@ -22,6 +21,40 @@ public class DefaultFile implements IFile
         }
 
         this.file = file;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return file != null ? file.hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof DefaultFile))
+        {
+            return false;
+        }
+
+        DefaultFile that = (DefaultFile) o;
+
+        if (file != null ? !file.equals(that.file) : that.file != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public OutputStream openOutputStream() throws IOException
+    {
+        return new BufferedOutputStream(new FileOutputStream(file));
     }
 
     @Override
@@ -52,33 +85,5 @@ public class DefaultFile implements IFile
         }
 
         Util.write(content, file);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return file != null ? file.hashCode() : 0;
-    }
-
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof DefaultFile))
-        {
-            return false;
-        }
-
-        DefaultFile that = (DefaultFile) o;
-
-        if (file != null ? !file.equals(that.file) : that.file != null)
-        {
-            return false;
-        }
-
-        return true;
     }
 }
