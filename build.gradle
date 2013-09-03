@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "mm.tstring.TStringGenerator"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.beust:jcommander:1.30'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+
+    testCompile 'junit:junit:4.11'
+}
