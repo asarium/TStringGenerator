@@ -1,16 +1,10 @@
 package mm.tstring.util;
 
-import mm.tstring.config.TStringConfig;
-import mm.tstring.config.TStringConfig.Mode;
-import mm.tstring.objects.TString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class declaring utility functions.
@@ -19,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class Util
 {
-    private static final Logger logger = Logger.getLogger(Util.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Util.class.getName());
 
     public static <T extends Comparable<T>> int compare(T o1, T o2)
     {
@@ -51,7 +45,7 @@ public class Util
     {
         if (!srcFile.isFile())
         {
-            logger.warning("'" + srcFile.getAbsolutePath() + "' is no file!");
+            logger.warn("'" + srcFile.getAbsolutePath() + "' is no file!");
             return false;
         }
 
@@ -59,7 +53,7 @@ public class Util
         {
             if (!dstFile.getParentFile().exists() && !dstFile.getParentFile().mkdirs())
             {
-                logger.warning("Failed to create directory '" + dstFile.getParent() + "'!");
+                logger.warn("Failed to create directory '" + dstFile.getParent() + "'!");
                 return false;
             }
 
@@ -67,18 +61,18 @@ public class Util
             {
                 if (dstFile.createNewFile())
                 {
-                    logger.fine("Created file '" + dstFile.getAbsolutePath() + "'.");
+                    logger.debug("Created file '" + dstFile.getAbsolutePath() + "'.");
                 }
             }
             catch (IOException e)
             {
-                logger.log(Level.WARNING, "Failed to create file '" + dstFile.getAbsolutePath() + "'!", e);
+                logger.warn("Failed to create file '" + dstFile.getAbsolutePath() + "'!", e);
                 return false;
             }
         }
         else if (!dstFile.isFile())
         {
-            logger.warning("Destination file '" + dstFile.getAbsolutePath() + "' already exists but is no file!");
+            logger.warn("Destination file '" + dstFile.getAbsolutePath() + "' already exists but is no file!");
             return false;
         }
 
@@ -94,12 +88,12 @@ public class Util
         catch (FileNotFoundException e)
         {
             // This should not happen
-            logger.log(Level.SEVERE, "Failed to find file!", e);
+            logger.error("Failed to find file!", e);
             return false;
         }
         catch (IOException e)
         {
-            logger.log(Level.SEVERE, "Failed to copy file!", e);
+            logger.error("Failed to copy file!", e);
             return false;
         }
         finally
@@ -112,8 +106,7 @@ public class Util
                 }
                 catch (IOException e)
                 {
-                    logger.log(Level.SEVERE,
-                            "Failed to close file channel from file '" + srcFile.getAbsolutePath() + "'!", e);
+                    logger.error("Failed to close file channel from file '" + srcFile.getAbsolutePath() + "'!", e);
                 }
             }
 
@@ -125,8 +118,7 @@ public class Util
                 }
                 catch (IOException e)
                 {
-                    logger.log(Level.SEVERE,
-                            "Failed to close file channel from file '" + dstFile.getAbsolutePath() + "'!", e);
+                    logger.error("Failed to close file channel from file '" + dstFile.getAbsolutePath() + "'!", e);
                 }
             }
         }
@@ -140,7 +132,7 @@ public class Util
         {
             if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
             {
-                logger.warning("Failed to create directory '" + file.getParent() + "'!");
+                logger.warn("Failed to create directory '" + file.getParent() + "'!");
                 return false;
             }
 
@@ -148,14 +140,14 @@ public class Util
             {
                 if (file.createNewFile())
                 {
-                    logger.fine("Created file '" + file.getAbsolutePath() + "'.");
+                    logger.debug("Created file '" + file.getAbsolutePath() + "'.");
                 }
 
                 return true;
             }
             catch (IOException e)
             {
-                logger.log(Level.WARNING, "Failed to create file '" + file.getAbsolutePath() + "'!", e);
+                logger.warn("Failed to create file '" + file.getAbsolutePath() + "'!", e);
                 return false;
             }
         }
@@ -240,12 +232,12 @@ public class Util
         {
             if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
             {
-                Util.logger.severe("Couldn't create directory '" + file.getParent() + "'!");
+                Util.logger.error("Couldn't create directory '" + file.getParent() + "'!");
                 return;
             }
             if (file.createNewFile())
             {
-                Util.logger.fine("Created file '" + file.getAbsolutePath() + "'.");
+                Util.logger.debug("Created file '" + file.getAbsolutePath() + "'.");
             }
         }
         FileWriter writer = null;

@@ -3,13 +3,13 @@ package mm.tstring.impl;
 import mm.tstring.IFile;
 import mm.tstring.ITstringParser;
 import mm.tstring.objects.FileTString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +21,7 @@ public class DefaultTStringParser implements ITstringParser
      */
     public static final Pattern tstringPattern = Pattern.compile("XSTR\\s*\\(\\s*\"([^\"]*)\"\\s*,\\s*(-?\\d+)\\s*\\)");
 
-    private static final Logger logger = Logger.getLogger(DefaultTStringParser.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTStringParser.class);
 
     @Override
     public Collection<FileTString> parseStrings(IFile file)
@@ -47,7 +47,7 @@ public class DefaultTStringParser implements ITstringParser
         }
         catch (IOException e)
         {
-            logger.log(Level.SEVERE, "Error while reading stream contents!", e);
+            logger.error("Error while reading stream contents!", e);
         }
 
         return tstrings;

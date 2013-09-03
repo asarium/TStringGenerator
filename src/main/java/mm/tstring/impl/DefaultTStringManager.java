@@ -8,12 +8,12 @@ import mm.tstring.config.TStringConfig;
 import mm.tstring.objects.FileTString;
 import mm.tstring.objects.TString;
 import mm.tstring.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +65,7 @@ public class DefaultTStringManager implements ITStringManager
         }
     }
 
-    private static final Logger logger = Logger.getLogger(DefaultTStringManager.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTStringManager.class);
 
     private static final Pattern tstringTableEntryPattern = Pattern.compile("(\\d*)\\s*,\\s*\"([^\"]*)\"");
 
@@ -167,7 +167,7 @@ public class DefaultTStringManager implements ITStringManager
     {
         if (!fileProvider.backupFiles())
         {
-            logger.warning("Failed to create backups, no files will be changed.");
+            logger.warn("Failed to create backups, no files will be changed.");
             return;
         }
 
@@ -212,7 +212,7 @@ public class DefaultTStringManager implements ITStringManager
 
                     if (!last.getValue().equals(tstring.getValue()))
                     {
-                        logger.warning(
+                        logger.warn(
                                 "TString with content '" + tstring.getValue() + "' and index " + tstring.getIndex() +
                                         " wasn't found in parsed TString list!");
                     }
@@ -234,7 +234,7 @@ public class DefaultTStringManager implements ITStringManager
             }
             catch (IOException e)
             {
-                logger.log(Level.WARNING, "Failed to update contents of file '" + entry.getKey().getName() + "'.", e);
+                logger.warn("Failed to update contents of file '" + entry.getKey().getName() + "'.", e);
             }
         }
     }
@@ -255,7 +255,7 @@ public class DefaultTStringManager implements ITStringManager
         }
         catch (IOException e)
         {
-            logger.log(Level.SEVERE, "Error while writing TStrings table!", e);
+            logger.error("Error while writing TStrings table!", e);
         }
         finally
         {
@@ -306,15 +306,15 @@ public class DefaultTStringManager implements ITStringManager
             valueSortedTStrings.add(string);
             indexSortedTStrings.add(string);
         }
-        else if (valueContained && !indexContained)
+        else if (valueContained && !indexContained && string.getIndex() != -1)
         {
             NavigableSet<TString> stringHeadSet = valueSortedTStrings.headSet(string, true);
-            logger.warning(String.format("Found duplicate string '%s' with different index %d and %d. Keeping first...",
-                    string.getValue(), stringHeadSet.last().getIndex(), string.getIndex()));
+            logger.warn("Found duplicate string '{}' with different index {} and {}. Keeping first...",
+                    string.getValue(), stringHeadSet.last().getIndex(), string.getIndex());
         }
         else if (!valueContained) // indexContained is always true here
         {
-            logger.warning(String.format("Found duplicate index usage of %d. Fixing...", string.getIndex()));
+            logger.warn("Found duplicate index usage of {}. Fixing...", string.getIndex());
 
             // Set new index
             string.setIndex(findNextFreeIndex());
@@ -334,10 +334,10 @@ public class DefaultTStringManager implements ITStringManager
 
             if (!sameValue.equals(sameIndex))
             {
-                logger.warning(String.format("Found mismatching TStrings!%n" +
-                        "String 1: XSTR(\"%s\", %d)%n" +
-                        "String 2: XSTR(\"%s\", %d)", sameIndex.getValue(), sameIndex.getIndex(), sameValue.getValue(),
-                        sameValue.getIndex()));
+                logger.warn("Found mismatching TStrings!\n" +
+                        "String 1: XSTR(\"{}\", {})\n" +
+                        "String 2: XSTR(\"{}\", {})", sameIndex.getValue(), sameIndex.getIndex(), sameValue.getValue(),
+                        sameValue.getIndex());
             }
         }
     }
@@ -369,7 +369,7 @@ public class DefaultTStringManager implements ITStringManager
     {
         if (tStringTable == null)
         {
-            logger.warning("No tstrings.tbl file found, going to create mode...");
+            logger.warn("No tstrings.tbl file found, going to create mode...");
             updateExisitingTable = false;
         }
         else
@@ -392,7 +392,7 @@ public class DefaultTStringManager implements ITStringManager
             }
             catch (IOException e)
             {
-                logger.log(Level.WARNING, "Failed to read tstrings contents, going to create mode.", e);
+                logger.warn("Failed to read tstrings contents, going to create mode.", e);
             }
         }
     }

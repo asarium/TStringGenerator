@@ -1,8 +1,9 @@
 package mm.tstring.objects;
 
 import mm.tstring.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Logger;
 
 /**
  * Class to represent an entry in tstrings.tbl
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 public class TString implements Comparable<TString>
 {
 
-    private static final Logger logger = Logger.getLogger(TString.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TString.class.getName());
 
     private boolean immutable = false;
 
@@ -125,7 +126,7 @@ public class TString implements Comparable<TString>
         }
         else
         {
-            TString.logger.warning("Found illegal value '" + index + "'. Setting it to -1.");
+            TString.logger.warn("Found illegal value '" + index + "'. Setting it to -1.");
             this.index = -1;
         }
     }

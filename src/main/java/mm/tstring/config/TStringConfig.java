@@ -5,9 +5,10 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.converters.FileConverter;
 import mm.tstring.util.TStringGlobals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 /**
  * @author m!m
@@ -33,7 +34,7 @@ public class TStringConfig
         UPDATE
     }
 
-    private static final Logger logger = Logger.getLogger(TStringConfig.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(TStringConfig.class);
 
     private static TStringConfig INSTANCE = TStringConfig.getInstance();
 
@@ -45,6 +46,18 @@ public class TStringConfig
     public static File getBackupDir()
     {
         return TStringConfig.getInstance().backupDir;
+    }
+
+    private static TStringConfig getInstance()
+    {
+        if (TStringConfig.INSTANCE == null)
+        {
+            return new TStringConfig();
+        }
+        else
+        {
+            return TStringConfig.INSTANCE;
+        }
     }
 
     /**
@@ -64,22 +77,10 @@ public class TStringConfig
         {
             if (!backupDir.mkdirs())
             {
-                TStringConfig.logger.severe("Couldn't create directory '" + backupDir.getAbsolutePath() + "'!");
+                TStringConfig.logger.error("Couldn't create directory '" + backupDir.getAbsolutePath() + "'!");
             }
         }
         TStringConfig.getInstance().backupDir = backupDir;
-    }
-
-    private static TStringConfig getInstance()
-    {
-        if (TStringConfig.INSTANCE == null)
-        {
-            return new TStringConfig();
-        }
-        else
-        {
-            return TStringConfig.INSTANCE;
-        }
     }
 
     /**
@@ -140,6 +141,11 @@ public class TStringConfig
         return true;
     }
 
+    public static boolean needsHelp()
+    {
+        return TStringConfig.getInstance().help;
+    }
+
     /**
      * This is the root Directory from where the missions and tables will be
      * searched
@@ -167,29 +173,11 @@ public class TStringConfig
         {
             if (!rootDir.mkdirs())
             {
-                TStringConfig.logger.severe("Couldn't create directory '" + rootDir.getAbsolutePath() + "'!");
+                TStringConfig.logger.error("Couldn't create directory '" + rootDir.getAbsolutePath() + "'!");
                 return;
             }
         }
         TStringConfig.getInstance().rootDir = rootDir;
-    }
-
-    public static boolean needsHelp()
-    {
-        return TStringConfig.getInstance().help;
-    }
-
-    /**
-     * Hold the value that suppresses the creation of backups.
-     */
-    public static boolean isNoBackup()
-    {
-        return TStringConfig.getInstance().noBackup;
-    }
-
-    public static void setNoBackup(boolean noBackup)
-    {
-        TStringConfig.getInstance().noBackup = noBackup;
     }
 
     private File backupDir = new File("backup").getAbsoluteFile();
@@ -204,11 +192,6 @@ public class TStringConfig
             description = "The mode in which this program will run. Defaults to 'create'.\n" + "'create' to create " +
                     "the tstring.tbl\n" + "'update' to update the tstring.tbl")
     private Mode mode = Mode.CREATE;
-
-    @Parameter(
-            names = "-nobackup",
-            description = "Forces the program to not backup files that are beeing modified.")
-    private boolean noBackup = false;
 
     @Parameter(
             names = {"-r", "-root"},
