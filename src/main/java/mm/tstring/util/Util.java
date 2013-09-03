@@ -135,7 +135,7 @@ public class Util
 
         if (!dstFile.exists())
         {
-            if (!dstFile.getParentFile().mkdirs())
+            if (!dstFile.getParentFile().exists() && !dstFile.getParentFile().mkdirs())
             {
                 logger.warning("Failed to create directory '" + dstFile.getParent() + "'!");
                 return false;
