@@ -4,6 +4,7 @@ import mm.tstring.IFile;
 import mm.tstring.IFileProvider;
 import mm.tstring.ITStringManager;
 import mm.tstring.ITstringParser;
+import mm.tstring.config.TStringConfig;
 import mm.tstring.objects.FileTString;
 import mm.tstring.objects.TString;
 import mm.tstring.util.Util;
@@ -13,6 +14,8 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DefaultTStringManager implements ITStringManager
 {
@@ -64,9 +67,18 @@ public class DefaultTStringManager implements ITStringManager
 
     private static final Logger logger = Logger.getLogger(DefaultTStringManager.class.getName());
 
+    private static final Pattern tstringTableEntryPattern = Pattern.compile("(\\d*)\\s*,\\s*\"([^\"]*)\"");
+
     private NavigableSet<TString> indexSortedTStrings;
 
+    private boolean updateExisitingTable;
+
     private NavigableSet<TString> valueSortedTStrings;
+
+    public DefaultTStringManager(TStringConfig.Mode mode)
+    {
+        updateExisitingTable = mode == TStringConfig.Mode.UPDATE;
+    }
 
     @Override
     public void collectTStrings(ITstringParser parser, IFileProvider fileProvider)
@@ -80,7 +92,7 @@ public class DefaultTStringManager implements ITStringManager
             throw new IllegalArgumentException("fileProvider");
         }
 
-        buildTStringsSets(parseTStrings(parser, fileProvider));
+        buildTStringsSets(parseTStrings(parser, fileProvider), fileProvider);
 
         fillGaps();
     }
@@ -254,11 +266,16 @@ public class DefaultTStringManager implements ITStringManager
         }
     }
 
-    private void buildTStringsSets(Collection<FileTString> fileStrings)
+    private void buildTStringsSets(Collection<FileTString> fileStrings, IFileProvider fileProvider)
     {
         // We use a special comparator to make two TStrings equal when their contents match
         valueSortedTStrings = new TreeSet<TString>(new TStringValueComparator());
         indexSortedTStrings = new TreeSet<TString>(new TStringIndexComparator());
+
+        if (updateExisitingTable)
+        {
+            readExisitingTable(fileProvider.getTStringTable(false));
+        }
 
         for (FileTString fileTString : fileStrings)
         {
@@ -346,5 +363,37 @@ public class DefaultTStringManager implements ITStringManager
         }
 
         return lastIndex + 1;
+    }
+
+    private void readExisitingTable(IFile tStringTable)
+    {
+        if (tStringTable == null)
+        {
+            logger.warning("No tstrings.tbl file found, going to create mode...");
+            updateExisitingTable = false;
+        }
+        else
+        {
+            try
+            {
+                String content = tStringTable.getContent();
+
+                Matcher matcher = tstringTableEntryPattern.matcher(content);
+
+                while (matcher.find())
+                {
+                    int index = Integer.parseInt(matcher.group(1));
+                    String contentString = matcher.group(2);
+
+                    TString string = new TString(contentString, index, true);
+                    valueSortedTStrings.add(string);
+                    indexSortedTStrings.add(string);
+                }
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.WARNING, "Failed to read tstrings contents, going to create mode.", e);
+            }
+        }
     }
 }
