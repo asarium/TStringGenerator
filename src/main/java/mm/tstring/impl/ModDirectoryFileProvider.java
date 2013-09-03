@@ -13,13 +13,15 @@ import java.util.List;
 
 public class ModDirectoryFileProvider implements IFileProvider
 {
-    private static final String[] fileExtensions = {"fs2, fc2", "tbl", "tbm"};
+    private static final String[] fileExtensions = {"fs2", "fc2", "tbl", "tbm"};
 
     private static final String[] searchPaths = {"/data/tables", "/data/missions"};
 
+    private File backupDir;
+
     private File modRootDirectory;
 
-    public ModDirectoryFileProvider(File modRootDirectory)
+    public ModDirectoryFileProvider(File modRootDirectory, File backupDir)
     {
         if (modRootDirectory == null)
         {
@@ -30,6 +32,16 @@ public class ModDirectoryFileProvider implements IFileProvider
             throw new IllegalArgumentException("root directory not actually a directory");
         }
 
+        if (backupDir == null)
+        {
+            throw new IllegalArgumentException("backupDir");
+        }
+        if (!backupDir.isDirectory())
+        {
+            throw new IllegalArgumentException("backup directory not actually a directory");
+        }
+
+        this.backupDir = backupDir;
         this.modRootDirectory = modRootDirectory;
     }
 
@@ -42,9 +54,7 @@ public class ModDirectoryFileProvider implements IFileProvider
         {
             URI relativize = rootURI.relativize(f.toURI());
 
-            URI backupURI = URI.create(rootURI.toString() +"backup/" +relativize.getPath());
-
-            File backupFile = new File(backupURI);
+            File backupFile = new File(backupDir, relativize.getPath());
 
             if (!Util.copyFile(f, backupFile))
             {
@@ -53,40 +63,6 @@ public class ModDirectoryFileProvider implements IFileProvider
         }
 
         return true;
-    }
-
-    @Override
-    public Iterable<IFile> getFiles()
-    {
-        if (!modRootDirectory.isDirectory())
-        {
-            return Collections.emptyList();
-        }
-
-        List<IFile> files = new ArrayList<IFile>();
-
-        for (File f : getFilesystemFiles())
-        {
-            files.add(new DefaultFile(f));
-        }
-
-        return files;
-    }
-
-    @Override
-    public IFile getTStringTable()
-    {
-        // the table should be located there
-        File table = new File(modRootDirectory, "data/tables/tstrings.tbl");
-
-        if (table.isFile())
-        {
-            return new DefaultFile(table);
-        }
-        else
-        {
-            return null;
-        }
     }
 
     private Collection<File> getFilesystemFiles()
@@ -116,5 +92,53 @@ public class ModDirectoryFileProvider implements IFileProvider
         }
 
         return files;
+    }
+
+    @Override
+    public Iterable<IFile> getFiles()
+    {
+        if (!modRootDirectory.isDirectory())
+        {
+            return Collections.emptyList();
+        }
+
+        List<IFile> files = new ArrayList<IFile>();
+
+        for (File f : getFilesystemFiles())
+        {
+            files.add(new DefaultFile(f));
+        }
+
+        return files;
+    }
+
+    @Override
+    public IFile getTStringTable(boolean create)
+    {
+        // the table should be located there
+        File table = new File(modRootDirectory, "data/tables/tstrings.tbl");
+
+        if (table.isFile())
+        {
+            return new DefaultFile(table);
+        }
+        else
+        {
+            if (create)
+            {
+                if (!table.exists())
+                {
+                    if (!Util.createFile(table))
+                    {
+                        return null;
+                    }
+                }
+                return new DefaultFile(table);
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
