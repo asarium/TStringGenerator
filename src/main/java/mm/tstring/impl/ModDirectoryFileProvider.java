@@ -17,26 +17,26 @@ public class ModDirectoryFileProvider implements IFileProvider
 
     private static final String[] searchPaths = {"/data/tables", "/data/missions"};
 
-    private File modRootDirecotry;
+    private File modRootDirectory;
 
-    public ModDirectoryFileProvider(File modRootDirecotry)
+    public ModDirectoryFileProvider(File modRootDirectory)
     {
-        if (modRootDirecotry == null)
+        if (modRootDirectory == null)
         {
-            throw new IllegalArgumentException("modRootDirecotry");
+            throw new IllegalArgumentException("modRootDirectory");
         }
-        if (!modRootDirecotry.isDirectory())
+        if (!modRootDirectory.isDirectory())
         {
             throw new IllegalArgumentException("root directory not actually a directory");
         }
 
-        this.modRootDirecotry = modRootDirecotry;
+        this.modRootDirectory = modRootDirectory;
     }
 
     @Override
     public boolean backupFiles()
     {
-        URI rootURI = modRootDirecotry.toURI();
+        URI rootURI = modRootDirectory.toURI();
 
         for (File f : getFilesystemFiles())
         {
@@ -58,7 +58,7 @@ public class ModDirectoryFileProvider implements IFileProvider
     @Override
     public Iterable<IFile> getFiles()
     {
-        if (!modRootDirecotry.isDirectory())
+        if (!modRootDirectory.isDirectory())
         {
             return Collections.emptyList();
         }
@@ -77,7 +77,7 @@ public class ModDirectoryFileProvider implements IFileProvider
     public IFile getTStringTable()
     {
         // the table should be located there
-        File table = new File(modRootDirecotry, "data/tables/tstrings.tbl");
+        File table = new File(modRootDirectory, "data/tables/tstrings.tbl");
 
         if (table.isFile())
         {
@@ -95,7 +95,7 @@ public class ModDirectoryFileProvider implements IFileProvider
 
         for (String searchDir : searchPaths)
         {
-            File directory = new File(modRootDirecotry, searchDir);
+            File directory = new File(modRootDirectory, searchDir);
 
             if (directory.isDirectory())
             {
