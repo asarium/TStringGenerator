@@ -67,6 +67,36 @@ public class TString implements Comparable<TString>
     }
 
     /**
+     * Gets the value of this object
+     *
+     * @return The value
+     */
+    public String getValue()
+    {
+        return this.value;
+    }
+
+    /**
+     * Sets the new value of this object
+     *
+     * @param value The new <code>String</code> value.
+     */
+    public void setValue(String value)
+    {
+        if (isImmutable())
+        {
+            throw new UnsupportedOperationException("Object is immutable");
+        }
+
+        this.value = value;
+    }
+
+    public boolean isImmutable()
+    {
+        return immutable;
+    }
+
+    /**
      * Gets the index of this object
      *
      * @return The index
@@ -100,36 +130,6 @@ public class TString implements Comparable<TString>
         }
     }
 
-    /**
-     * Gets the value of this object
-     *
-     * @return The value
-     */
-    public String getValue()
-    {
-        return this.value;
-    }
-
-    /**
-     * Sets the new value of this object
-     *
-     * @param value The new <code>String</code> value.
-     */
-    public void setValue(String value)
-    {
-        if (isImmutable())
-        {
-            throw new UnsupportedOperationException("Object is immutable");
-        }
-
-        this.value = value;
-    }
-
-    public boolean isImmutable()
-    {
-        return immutable;
-    }
-
     @Override
     public int hashCode()
     {
@@ -158,5 +158,11 @@ public class TString implements Comparable<TString>
         }
 
         return !(value != null ? !value.equals(tString.value) : tString.value != null);
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("XSTR(\"%s\", %d)", value == null ? "<nothing>" : value, index);
     }
 }
