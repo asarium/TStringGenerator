@@ -21,84 +21,6 @@ public class Util
 {
     private static final Logger logger = Logger.getLogger(Util.class.getName());
 
-    private static final List<Integer> occupiedIndexes = new ArrayList<Integer>();
-
-    /**
-     * Overloaded method. Referes to {@link #addTString(TString)}.
-     *
-     * @param value Value of the TString
-     * @param index Index of the TString
-     */
-    public synchronized static void addTString(String value, int index)
-    {
-        Util.addTString(new TString(value, index));
-    }
-
-    /**
-     * Adds the specified <code>TString</code> to
-     * {@link TStringGlobals#tstrings} but only if the value of the string isn't
-     * already in the list.
-     *
-     * @param string The TString to add
-     */
-    public synchronized static void addTString(TString string)
-    {
-        for (TString tstring : TStringGlobals.tstrings)
-        {
-            if (tstring.getValue().equals(string.getValue()))
-            {
-                return;
-            }
-        }
-
-        if (!Util.occupiedIndexes.contains(string.getIndex()) && string.getIndex() > 0)
-        {
-            TStringGlobals.tstrings.add(string);
-            Util.occupiedIndexes.add(string.getIndex());
-        }
-        else
-        {
-            while (Util.occupiedIndexes.contains(string.getIndex()))
-            {
-                string.setIndex(string.getIndex() + 1);
-            }
-            TStringGlobals.tstrings.add(string);
-            Util.occupiedIndexes.add(string.getIndex());
-        }
-
-        Collections.sort(TStringGlobals.tstrings);
-    }
-
-    private static void askSwitch()
-    {
-        System.out.print("An existing TStrings table has been found. Do you want to switch to the update mode?(y/n)");
-        String input = null;
-        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-        while (input == null)
-        {
-            try
-            {
-                input = stdIn.readLine();
-            }
-            catch (IOException e)
-            {
-            }
-            if (input != null)
-            {
-                input = input.toLowerCase();
-                if (input.equals("y"))
-                {
-                    TStringConfig.setMode(Mode.UPDATE);
-                    System.out.println("Mode has been switched to 'update'");
-                }
-                else
-                {
-                    System.out.println("Staying with 'create'");
-                }
-            }
-        }
-    }
-
     public static <T extends Comparable<T>> int compare(T o1, T o2)
     {
         if (o1 == o2)
@@ -212,6 +134,41 @@ public class Util
         return true;
     }
 
+    public static boolean createFile(File file)
+    {
+        if (!file.exists())
+        {
+            if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+            {
+                logger.warning("Failed to create directory '" + file.getParent() + "'!");
+                return false;
+            }
+
+            try
+            {
+                if (file.createNewFile())
+                {
+                    logger.fine("Created file '" + file.getAbsolutePath() + "'.");
+                }
+
+                return true;
+            }
+            catch (IOException e)
+            {
+                logger.log(Level.WARNING, "Failed to create file '" + file.getAbsolutePath() + "'!", e);
+                return false;
+            }
+        }
+        else if (!file.isFile())
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public static String getExtension(String name)
     {
         if (name == null)
@@ -220,139 +177,6 @@ public class Util
         }
 
         return name.substring(name.lastIndexOf('.') + 1);
-    }
-
-    /**
-     * Return the index matching the specified String or -1 if not found.
-     *
-     * @param search The String to search for
-     * @return The index of the TString object
-     */
-    public static int getIndex(String search)
-    {
-        for (TString string : TStringGlobals.tstrings)
-        {
-            if (string.getValue().equals(search))
-            {
-                return string.getIndex();
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Searches for unoccupied indexes and returns the first it can find.
-     *
-     * @return The first free index
-     */
-    public static int getNextFreeTStringsIndex()
-    {
-        Collections.sort(Util.occupiedIndexes);
-        int last = -1;
-        for (Integer integ : Util.occupiedIndexes)
-        {
-            if (integ - last > 0)
-            {
-                return last + 1;
-            }
-            else
-            {
-                last = last + 1;
-            }
-        }
-        return Util.occupiedIndexes.get(Util.occupiedIndexes.size() - 1) + 1;
-    }
-
-    /**
-     * Filters the files that are to be parsed out of the directories specified
-     * by {@link TStringGlobals#searchDirs}
-     *
-     * @return The files to be parsed.
-     */
-    public static File[] getParseFiles()
-    {
-        List<File> parseFiles = new ArrayList<File>();
-        boolean tStringFound = false;
-        for (String search : TStringGlobals.searchDirs)
-        {
-            File searchDir = new File(TStringConfig.getRootDir().getAbsolutePath() + search);
-            if (searchDir.exists())
-            {
-                File[] searchFiles = searchDir.listFiles(new FilenameFilter()
-                {
-
-                    @Override
-                    public boolean accept(File dir, String name)
-                    {
-                        return Util.isTranslateFile(name);
-                    }
-                });
-                for (File searchFile : searchFiles)
-                {
-                    if (searchFile.getName().equals("tstrings.tbl"))
-                    {
-                        tStringFound = true;
-                        if (TStringConfig.getMode() == Mode.CREATE)
-                        {
-                            // Util.askSwitch();
-                        }
-                    }
-                    parseFiles.add(searchFile);
-                }
-            }
-            else
-            {
-                System.err.println("The directory '" + searchDir.getAbsolutePath() + "' does not exist.");
-            }
-        }
-        if (TStringConfig.getMode() == Mode.UPDATE && !tStringFound)
-        {
-            System.out.println(
-                    "'update' mode was specified but there was no TStrings table found. Switching back to 'create'");
-            TStringConfig.setMode(Mode.CREATE);
-        }
-        File[] parseArray = new File[parseFiles.size()];
-        for (int i = 0; i < parseArray.length; i++)
-        {
-            parseArray[i] = parseFiles.get(i);
-        }
-        return parseArray;
-    }
-
-    public static boolean isTranslateFile(String name)
-    {
-        final String[] exts = {".tbl", ".tbm", ".fs2", ".fc2"};
-
-        for (String ext : exts)
-        {
-            if (name.endsWith(ext))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public static void optimizeTable()
-    {
-        Collections.sort(TStringGlobals.tstrings);
-        System.out.println("Optimizing table...");
-        for (int i = 0; i < TStringGlobals.tstrings.size(); i++)
-        {
-            TString current = TStringGlobals.tstrings.get(i);
-            if (i == 0 && current.getIndex() > 0)
-            {
-                current.setIndex(0);
-            }
-            if (i > 0)
-            {
-                if (current.getIndex() - TStringGlobals.tstrings.get(i - 1).getIndex() > 1)
-                {
-                    current.setIndex(TStringGlobals.tstrings.get(i - 1).getIndex() + 1);
-                }
-            }
-        }
     }
 
     /**

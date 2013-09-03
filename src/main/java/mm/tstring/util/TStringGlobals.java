@@ -14,16 +14,4 @@ import java.util.regex.Pattern;
 public class TStringGlobals
 {
     public final static String applicationName = "tstrings";
-
-    /**
-     * The program will search for the files in these directories
-     */
-    public static final String[] searchDirs = {"/data/tables", "/data/missions"};
-
-    public static final Pattern tstringPattern = Pattern.compile("XSTR\\s*\\(\\s*\"([^\"]*)\"\\s*,\\s*(-?\\d+)\\s*\\)");
-
-    /**
-     * The list of currently known TStrings
-     */
-    public static final List<TString> tstrings = new ArrayList<TString>();
 }
