@@ -42,7 +42,7 @@ public class ModDirectoryFileProvider implements IFileProvider
         {
             URI relativize = rootURI.relativize(f.toURI());
 
-            URI backupURI = rootURI.resolve("/backup").resolve(relativize);
+            URI backupURI = URI.create(rootURI.toString() +"backup/" +relativize.getPath());
 
             File backupFile = new File(backupURI);
 
