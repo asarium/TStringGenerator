@@ -1,7 +1,7 @@
 package mm.tstring.impl;
 
-import junit.framework.Assert;
 import mm.tstring.util.Util;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
