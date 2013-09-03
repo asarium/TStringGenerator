@@ -87,6 +87,52 @@ public class DefaultTStringManager implements ITStringManager
         }
 
         buildTStringsSets(parseTStrings(parser, fileProvider));
+
+        fillGaps();
+    }
+
+    /**
+     * Searches through indexSortedTStrings and fills index gaps
+     */
+    private void fillGaps()
+    {
+        // A new set needs to be filled in as entries may change their position
+        NavigableSet<TString> newSet = new TreeSet<TString>(new TStringIndexComparator());
+
+        int lastIndex = -1;
+        for (TString string : indexSortedTStrings)
+        {
+            if (string.isImmutable())
+            {
+                // We can't change the string so simply add it but don't change lastIndex
+                newSet.add(string);
+            }
+            else
+            {
+                int diff = string.getIndex() - lastIndex;
+
+                if (diff > 1)
+                {
+                    // We have a gap
+                    int index = lastIndex;
+
+                    // Increment index until we find the right spot
+                    do
+                    {
+                        index++;
+                        string.setIndex(index);
+                    } while (!newSet.add(string));
+                }
+                else
+                {
+                    newSet.add(string);
+                }
+
+                lastIndex = string.getIndex();
+            }
+        }
+
+        indexSortedTStrings = newSet;
     }
 
     private Collection<FileTString> parseTStrings(ITstringParser parser, IFileProvider fileProvider)
@@ -111,9 +157,9 @@ public class DefaultTStringManager implements ITStringManager
     }
 
     @Override
-    public void writeStrings(IFileProvider fileProvider)
+    public void writeStrings(ITstringParser parser, IFileProvider fileProvider)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     private void buildTStringsSets(Collection<FileTString> fileStrings)
