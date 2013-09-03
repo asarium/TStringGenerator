@@ -1,8 +1,7 @@
 package mm.tstring;
 
-import mm.tstring.IFile;
-
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class MemoryFile implements IFile
 {
@@ -14,6 +13,12 @@ public class MemoryFile implements IFile
     {
         this.content = content;
         this.name = name;
+    }
+
+    @Override
+    public OutputStream openOutputStream() throws IOException
+    {
+        throw new UnsupportedOperationException();
     }
 
     @Override
