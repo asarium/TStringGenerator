@@ -12,8 +12,8 @@ public class FileTString extends TString
      *
      * @param value  The <code>String</code> value of this TString
      * @param index  The index.
-     * @param offset The offset in the file
-     * @param length The length of the whole XSTR part
+     * @param offset The starting character of the index part
+     * @param length The length of the index part
      */
     public FileTString(String value, int index, long offset, long length)
     {
@@ -22,12 +22,12 @@ public class FileTString extends TString
         this.length = length;
     }
 
-    public long getLength()
+    public long getIndexLength()
     {
         return length;
     }
 
-    public long getOffset()
+    public long getIndexOffset()
     {
         return offset;
     }

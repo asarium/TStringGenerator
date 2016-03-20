@@ -218,13 +218,13 @@ public class DefaultTStringManager implements ITStringManager
                     }
                     else
                     {
-                        String newContent = String.format("XSTR(\"%s\", %d)", last.getValue(), last.getIndex());
+                        String newContent = Integer.toString(last.getIndex());
 
-                        int begin = (int) (tstring.getOffset() + currentOffset);
-                        int end = (int) (begin + tstring.getLength());
+                        int begin = (int) (tstring.getIndexOffset() + currentOffset);
+                        int end = (int) (begin + tstring.getIndexLength());
 
                         // Recompute offset
-                        currentOffset = currentOffset + newContent.length() - tstring.getLength();
+                        currentOffset = currentOffset + newContent.length() - tstring.getIndexLength();
 
                         contentBuilder.replace(begin, end, newContent);
                     }
