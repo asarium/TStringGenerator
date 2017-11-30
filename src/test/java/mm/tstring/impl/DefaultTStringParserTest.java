@@ -83,6 +83,35 @@ public class DefaultTStringParserTest {
         assertFileTstringEquals(tstringList.get(1), "Wereshivans", 4208, 692, 4);
     }
 
+    @Test
+    public void testVariableXstr() throws Exception {
+        String content = "#Events\t\t;! 1 total\n" +
+                "\n" +
+                "$Formula: ( when \n" +
+                "   ( key-pressed \"1\" ) \n" +
+                ";;FSO 3.7.1;;   ( modify-variable-xstr \n" +
+                ";;FSO 3.7.1;;      \"@TranslateTest[Default]\" \n" +
+                "      \"Untranslated\" \n" +
+                "      3423\n" +
+                ";;FSO 3.7.1;;   )\n" +
+                ";;FSO 3.7.1;;)\n" +
+                "+Name: Event name\n" +
+                "+Repeat Count: 1\n" +
+                "+Interval: 1" +
+                "\n";
+        MemoryFile file = new MemoryFile("testFile", content);
+
+        DefaultTStringParser parser = new DefaultTStringParser();
+
+        Collection<FileTString> tstrings = parser.parseStrings(file);
+
+        Assert.assertEquals(1, tstrings.size());
+
+        List<FileTString> tstringList = new ArrayList<FileTString>(tstrings);
+
+        assertFileTstringEquals(tstringList.get(0), "Untranslated", 3423, 177, 4);
+    }
+
     private void assertFileTstringEquals(FileTString tstring, String message, int index, long offset, long length) {
         Assert.assertNotNull(tstring);
 

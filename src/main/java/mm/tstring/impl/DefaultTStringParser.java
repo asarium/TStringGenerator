@@ -27,6 +27,9 @@ public class DefaultTStringParser implements ITstringParser {
      */
     public static final Pattern techIntelPattern = Pattern.compile("tech-add-intel-xstr\\s*(?:;;.*;;)?\\s*\"([^\"]*)\"\\s*(?:;;.*;;)?\\s*(-?\\d+)");
 
+    public static final Pattern modifyVariablePattern =
+            Pattern.compile("modify-variable-xstr\\s*(?:;;.*;;)?\\s*\"(?:[^\"]*)\"\\s*(?:;;.*;;)?\\s*\"([^\"]*)\"\\s*(?:;;.*;;)?\\s*(-?\\d+)");
+
     private static final Logger logger = LoggerFactory.getLogger(DefaultTStringParser.class);
 
     private static void findTStrings(List<FileTString> outList, Pattern patter, String content) {
@@ -57,6 +60,7 @@ public class DefaultTStringParser implements ITstringParser {
 
         findTStrings(tstrings, tstringPattern, contents);
         findTStrings(tstrings, techIntelPattern, contents);
+        findTStrings(tstrings, modifyVariablePattern, contents);
 
         return tstrings;
     }

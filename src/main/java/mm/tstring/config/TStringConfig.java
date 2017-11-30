@@ -196,6 +196,6 @@ public class TStringConfig
     @Parameter(
             names = {"-r", "-root"},
             converter = FileConverter.class,
-            description = "The directory from which this programm will search in data/mission and data/tables")
+            description = "The directory from which this programm will search in data/mission, data/scripts and data/tables")
     private File rootDir = new File(".").getAbsoluteFile();
 }
