@@ -26,9 +26,9 @@ public class DefaultTStringParserTest {
 
         List<FileTString> tstringList = new ArrayList<FileTString>(tstrings);
 
-        assertFileTstringEquals(tstringList.get(0), "Test", 128, 0, 17);
-        assertFileTstringEquals(tstringList.get(1), "Test1", 15, 18, 28);
-        assertFileTstringEquals(tstringList.get(2), "Test 6", 9, 112, 17);
+        assertFileTstringEquals(tstringList.get(0), "Test", 128, 13, 3);
+        assertFileTstringEquals(tstringList.get(1), "Test1", 15, 43, 2);
+        assertFileTstringEquals(tstringList.get(2), "Test 6", 9, 127, 1);
     }
 
     @Test
